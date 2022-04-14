@@ -5,32 +5,40 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _jumpForce;
     [SerializeField] private Animator _animator;
     [SerializeField] private float _groundDetectionHeight;
+    private const float _runSpeedConst = 10f;
     private Rigidbody2D _rigidbody;
+    private float horizontalMovement = 0;
     private bool _isInAir = false;
 
     public void Start() {
         this._rigidbody = this.GetComponent<Rigidbody2D>();
     }
 
-    public void Update() {
-        this.CheckGroundStatus();
-        this.Jump();
+    public void FixedUpdate() {
         this.HandleMovement();
     }
 
-    private void HandleMovement() {
-        float horizontal = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(horizontal, Vector3.zero.y, Vector3.zero.z);
-        transform.position += movement * Time.deltaTime * _speed;
-
-        this._animator.SetBool("isMoving", Mathf.Abs(horizontal) > 0);
-        this.FlipSpriteToMovementDirection(horizontal);
+    public void Update() {
+        this.CheckGroundStatus();
+        this.Jump();
+        this.GetMovement();
     }
 
-    private void FlipSpriteToMovementDirection(float horizontal) {
-        if (horizontal > 0) {
+    private void GetMovement() {
+        horizontalMovement = Input.GetAxis("Horizontal") * this._speed * _runSpeedConst;
+    }
+
+    private void HandleMovement() {
+        _rigidbody.velocity = new Vector2(horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y);
+
+        this._animator.SetBool("isMoving", Mathf.Abs(horizontalMovement) > 0);
+        this.FlipSpriteToMovementDirection(horizontalMovement);
+    }
+
+    private void FlipSpriteToMovementDirection(float horizontalMovement) {
+        if (horizontalMovement > 0) {
             transform.localScale = new Vector3(1, 1, 1);
-        } else if (horizontal < 0) {
+        } else if (horizontalMovement < 0) {
             transform.localScale = new Vector3(-1, 1, 1);
         }
     }
@@ -43,14 +51,21 @@ public class Player : MonoBehaviour {
     }
 
     public void CheckGroundStatus() {
-        RaycastHit2D hit = Physics2D.Raycast(
-            transform.position,
+        float direction = transform.localScale.x;
+        RaycastHit2D leftJumpRay = Physics2D.Raycast(
+            transform.position + new Vector3(direction * -0.1f, 0, 0),
+            Vector2.down,
+            this._groundDetectionHeight,
+            1 << LayerMask.NameToLayer("Ground")
+        );
+        RaycastHit2D rightJumpRay = Physics2D.Raycast(
+            transform.position + new Vector3(direction * 0.25f, 0, 0),
             Vector2.down,
             this._groundDetectionHeight,
             1 << LayerMask.NameToLayer("Ground")
         );
 
-        if (hit.collider) {
+        if (leftJumpRay.collider || rightJumpRay.collider) {
             this.SetIsInAir(false);
 
             return;
