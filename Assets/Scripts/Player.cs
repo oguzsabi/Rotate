@@ -9,16 +9,25 @@ public class Player : MonoBehaviour {
     private Rigidbody2D _rigidbody;
     private float horizontalMovement = 0;
     private bool _isInAir = false;
+    private bool _isDead = false;
 
     public void Start() {
         this._rigidbody = this.GetComponent<Rigidbody2D>();
     }
 
     public void FixedUpdate() {
+        if (_isDead) {
+            return;
+        }
+
         this.HandleMovement();
     }
 
     public void Update() {
+        if (_isDead) {
+            return;
+        }
+
         this.CheckGroundStatus();
         this.Jump();
         this.GetMovement();
@@ -72,6 +81,13 @@ public class Player : MonoBehaviour {
         }
 
         this.SetIsInAir(true);
+    }
+
+    public void Die() {
+        this._isDead = true;
+        this._animator.SetBool("isDead", true);
+        this._rigidbody.velocity = Vector2.zero;
+        gameObject.GetComponent<ParticleSystem>().Play();
     }
 
     private void SetIsInAir(bool isInAir) {
