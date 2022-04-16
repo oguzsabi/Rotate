@@ -178,6 +178,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6951832344412753754}
   - component: {fileID: 6951832344412753755}
+  - component: {fileID: 354914732}
   m_Layer: 0
   m_Name: SpikeGroupFour
   m_TagString: Untagged
@@ -230,6 +231,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.405149, y: 0.43410683}
   m_EdgeRadius: 0
+--- !u!114 &354914732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6951832344412753752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 527d11358a60148e4b78a9e6fc29d4f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _restartTime: 1
 --- !u!1 &6951832344447520913
 GameObject:
   m_ObjectHideFlags: 0

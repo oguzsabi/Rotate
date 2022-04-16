@@ -94,4 +94,8 @@ public class Player : MonoBehaviour {
         this._isInAir = isInAir;
         this._animator.SetBool("isInAir", isInAir);
     }
+
+    public void SetHasGravity(bool hasGravity) {
+        _rigidbody.gravityScale = hasGravity ? 3f : 0f;
+    }
 }
