@@ -10,13 +10,14 @@ public class Player : MonoBehaviour {
     private float horizontalMovement = 0;
     private bool _isInAir = false;
     private bool _isDead = false;
+    private bool _canMove = true;
 
     public void Start() {
         this._rigidbody = this.GetComponent<Rigidbody2D>();
     }
 
     public void FixedUpdate() {
-        if (_isDead) {
+        if (_isDead || !_canMove) {
             return;
         }
 
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour {
     }
 
     public void Update() {
-        if (_isDead) {
+        if (_isDead || !_canMove) {
             return;
         }
 
@@ -85,17 +86,30 @@ public class Player : MonoBehaviour {
 
     public void Die() {
         this._isDead = true;
+
         this._animator.SetBool("isDead", true);
-        this._rigidbody.velocity = Vector2.zero;
+        this.ResetVelocity();
         gameObject.GetComponent<ParticleSystem>().Play();
     }
 
-    private void SetIsInAir(bool isInAir) {
+    public void SetIsInAir(bool isInAir) {
         this._isInAir = isInAir;
         this._animator.SetBool("isInAir", isInAir);
     }
 
     public void SetHasGravity(bool hasGravity) {
         _rigidbody.gravityScale = hasGravity ? 3f : 0f;
+    }
+
+    public void ResetVelocity() {
+        this._rigidbody.velocity = Vector2.zero;
+    }
+
+    public void SetCanMove(bool canMove) {
+        this._canMove = canMove;
+    }
+
+    public bool GetIsInAir() {
+        return this._isInAir;
     }
 }
