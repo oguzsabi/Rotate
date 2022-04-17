@@ -8,7 +8,7 @@ public class LevelLoader : MonoBehaviour {
     
     public static void LoadNextLevel() {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex + 1);
+        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
     }
 
     public static void LoadStartScene() {
