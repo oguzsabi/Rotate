@@ -53,7 +53,6 @@ public class Rotate : MonoBehaviour {
             this._player.SetHasGravity(true);
             this._player.SetCanMove(true);
             this._virtualCameraController.SetDamping(0.5f);
-            Debug.Log("Rotate complete");
 
             return;
         }
