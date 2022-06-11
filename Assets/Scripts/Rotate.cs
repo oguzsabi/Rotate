@@ -1,10 +1,10 @@
-using Cinemachine;
 using UnityEngine;
 
 public class Rotate : MonoBehaviour {
     [SerializeField] private float _rotateSpeed = 1f;
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private Transform _camera;
+    [SerializeField] private AudioSource _rotateAudioManager;
     private bool _isRotating = false;
     private const float ROTATE_ANGLE = 90f;
     private float _currentRotateAngle = 0f;
@@ -32,6 +32,7 @@ public class Rotate : MonoBehaviour {
             this._currentRotateAngle = Input.GetKeyDown(KeyCode.Q) ? ROTATE_ANGLE : -ROTATE_ANGLE;
             this._targetAngle = this.CalculateTargetAngle();
 
+            this._rotateAudioManager.Play();
             this._player.SetIsInAir(true);
             this._player.SetHasGravity(false);
             this._player.SetCanMove(false);
