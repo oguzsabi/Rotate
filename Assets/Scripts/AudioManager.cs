@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class BackgroundAudioManager : MonoBehaviour {
+public class AudioManager : MonoBehaviour {
     public void Awake() {
         SetupSingleton();
     }
 
     private void SetupSingleton() {
-        var musicPlayerCount = FindObjectsOfType(GetType()).Length;
+        var audioManagerCount = FindObjectsOfType(GetType()).Length;
 
-        if (musicPlayerCount < 2) {
+        if (audioManagerCount < 2) {
             DontDestroyOnLoad(gameObject);
         } else {
             Destroy(gameObject);

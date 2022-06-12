@@ -18,6 +18,10 @@ public class Rotate : MonoBehaviour {
     }
 
     public void Update() {
+        if (!this._player) {
+            this._player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        }
+
         this.HandleRotation();
         this.RotateMap();
     }

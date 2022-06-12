@@ -119,6 +119,7 @@ public class Player : MonoBehaviour {
     public void Die() {
         this._isDead = true;
 
+        this.SetHasGravity(false);
         this._playerAudioManager.PlayDeathSound();
         this._animator.SetBool("isDead", true);
         this.ResetVelocity();
