@@ -7,6 +7,8 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _groundDetectionHeight;
     [SerializeField] private float _fallGravityMultiplier;
     [SerializeField] private Camera _camera;
+    [SerializeField] private PhysicsMaterial2D _zeroFrictionMat;
+    [SerializeField] private PhysicsMaterial2D _fullFrictionMat;
     private const float DEFAULT_GRAVITY_SCALE = 3f;
     private const float RUN_SPEED_MULTIPLIER = 10f;
     private Rigidbody2D _rigidbody;
@@ -39,6 +41,7 @@ public class Player : MonoBehaviour {
         this.CheckGroundStatus();
         this.Jump();
         this.GetMovement();
+        this.HandleFriction();
         this.SetFallingGravity();
         this.PlaySFX();
     }
@@ -55,6 +58,14 @@ public class Player : MonoBehaviour {
         this.FlipSpriteToMovementDirection(_horizontalMovement);
     }
 
+    private void HandleFriction() {
+        if (this._isRunning) {
+            this._rigidbody.sharedMaterial = this._zeroFrictionMat;
+        } else {
+            this._rigidbody.sharedMaterial = this._fullFrictionMat;
+        }
+    }
+
     private void FlipSpriteToMovementDirection(float horizontalMovement) {
         if (horizontalMovement > 0) {
             transform.localScale = new Vector3(1, 1, 1);
@@ -65,6 +76,7 @@ public class Player : MonoBehaviour {
 
     private void Jump() {
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && !this._isInAir) {
+            this._rigidbody.velocity = new Vector2(this._rigidbody.velocity.x, 0);
             this._rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
             this._playerAudioManager.PlayJumpSound();
         }
