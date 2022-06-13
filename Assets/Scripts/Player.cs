@@ -14,6 +14,7 @@ public class Player : MonoBehaviour {
     private Rigidbody2D _rigidbody;
     private float _horizontalMovement = 0;
     private bool _isInAir = false;
+    private bool _hasJumped = false;
     private bool _isDead = false;
     private bool _canMove = true;
     private bool _isRunning = false;
@@ -52,7 +53,11 @@ public class Player : MonoBehaviour {
     }
 
     private void HandleMovement() {
-        this._rigidbody.velocity = new Vector2(this._horizontalMovement * Time.fixedDeltaTime, this._rigidbody.velocity.y);
+        if (this._isRunning && !this._isInAir && !this._hasJumped) {
+            this._rigidbody.velocity = Vector2.ClampMagnitude(new Vector2(this._horizontalMovement * Time.fixedDeltaTime, this._rigidbody.velocity.y), 7f);
+        } else {
+            this._rigidbody.velocity = new Vector2(this._horizontalMovement * Time.fixedDeltaTime, this._rigidbody.velocity.y);
+        }
 
         this._animator.SetBool("isMoving", Mathf.Abs(_horizontalMovement) > 0);
         this.FlipSpriteToMovementDirection(_horizontalMovement);
@@ -77,6 +82,8 @@ public class Player : MonoBehaviour {
     private void Jump() {
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && !this._isInAir) {
             this._rigidbody.velocity = new Vector2(this._rigidbody.velocity.x, 0);
+            this._hasJumped = true;
+
             this._rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
             this._playerAudioManager.PlayJumpSound();
         }
@@ -99,7 +106,7 @@ public class Player : MonoBehaviour {
 
         if (leftJumpRay.collider || rightJumpRay.collider) {
             if (this._isInAir) {
-                this._playerAudioManager.PlayLandingSound();
+                this.BeforeLandingOperations();
             }
 
             this.SetIsInAir(false);
@@ -136,6 +143,11 @@ public class Player : MonoBehaviour {
         this._animator.SetBool("isDead", true);
         this.ResetVelocity();
         gameObject.GetComponent<ParticleSystem>().Play();
+    }
+
+    private void BeforeLandingOperations() {
+        this._playerAudioManager.PlayLandingSound();
+        this._hasJumped = false;
     }
 
     public void SetIsInAir(bool isInAir) {
