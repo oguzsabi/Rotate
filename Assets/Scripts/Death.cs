@@ -2,12 +2,16 @@ using System.Collections;
 using UnityEngine;
 
 public class Death : MonoBehaviour {
-    [SerializeField] public float _restartTime = 1f;
+    [SerializeField] private float _restartTime;
 
     public void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.tag == "Player") {
-            other.gameObject.GetComponent<Player>().Die();
-            StartCoroutine(RestartLevel());
+            Player player = other.gameObject.GetComponent<Player>();
+            
+            if (!player.isInvincible) {
+                other.gameObject.GetComponent<Player>().Die();
+                StartCoroutine(RestartLevel());
+            }
         }
     }
 

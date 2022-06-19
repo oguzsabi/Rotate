@@ -1,6 +1,8 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
+    [SerializeField] public bool isInvincible;
+
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpForce;
     [SerializeField] private Animator _animator;

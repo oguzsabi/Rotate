@@ -155,9 +155,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5035568327700959792}
   - component: {fileID: 5035568327700959807}
+  - component: {fileID: 5035568327700959793}
   - component: {fileID: 5035568327700959794}
   - component: {fileID: 5035568327700959795}
-  - component: {fileID: 5035568327700959793}
   - component: {fileID: 5035568327700959796}
   - component: {fileID: 1670009358}
   - component: {fileID: 1670009357}
@@ -236,6 +236,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5035568327700959793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5035568327700959806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdba89afa0b749a4888ab39e1a7c95ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isInvincible: 0
+  _speed: 35
+  _jumpForce: 14
+  _animator: {fileID: 5035568327700959796}
+  _groundDetectionHeight: 0.6
+  _fallGravityMultiplier: 1.5
+  _camera: {fileID: 0}
+  _zeroFrictionMat: {fileID: 6200000, guid: 005921c553856544687b95db685b0639, type: 2}
+  _fullFrictionMat: {fileID: 6200000, guid: 40c595f0a4bbbbf48b7b81334ed7115c, type: 2}
 --- !u!50 &5035568327700959794
 Rigidbody2D:
   serializedVersion: 4
@@ -273,24 +294,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.08198786, y: -0.013156414}
   m_Size: {x: 0.55261326, y: 1.1129732}
   m_Direction: 0
---- !u!114 &5035568327700959793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5035568327700959806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdba89afa0b749a4888ab39e1a7c95ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speed: 35
-  _jumpForce: 14
-  _animator: {fileID: 5035568327700959796}
-  _groundDetectionHeight: 0.6
-  _fallGravityMultiplier: 1.5
-  _camera: {fileID: 0}
 --- !u!95 &5035568327700959796
 Animator:
   serializedVersion: 4
