@@ -36,7 +36,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 85.899994, y: -9.300003}
+  m_AnchoredPosition: {x: 85.899994, y: -9.299988}
   m_SizeDelta: {x: 163.321, y: 16.721008}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1557035359719282278
@@ -283,7 +283,7 @@ GameObject:
   - component: {fileID: 8016963692729207475}
   - component: {fileID: 8016963692729207474}
   - component: {fileID: 8016963692729207485}
-  - component: {fileID: 8016963693213607668}
+  - component: {fileID: 1998408780417179904}
   m_Layer: 5
   m_Name: CameraCanvas
   m_TagString: Untagged
@@ -373,7 +373,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &8016963693213607668
+--- !u!114 &1998408780417179904
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

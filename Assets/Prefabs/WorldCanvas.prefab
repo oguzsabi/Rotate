@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 51.1125, y: 101.5}
+  m_AnchoredPosition: {x: 69.9, y: 28.2}
   m_SizeDelta: {x: 136.616, y: 30.855}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7459962367402680254
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Level 01
+  m_text: 'Level 02
 
 '
   m_isRightToLeft: 0
@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 7459962368061299966}
   - component: {fileID: 7459962368061299967}
   - component: {fileID: 7459962368061299952}
+  - component: {fileID: 7459962367480443065}
   m_Layer: 5
   m_Name: WorldCanvas
   m_TagString: Untagged
@@ -238,3 +239,16 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &7459962367480443065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7459962368061299953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c1b65d11b6bce4ea9f88a0995ca780, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _levelText: {fileID: 7459962367402680255}

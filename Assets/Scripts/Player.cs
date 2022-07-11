@@ -8,11 +8,14 @@ public class Player : MonoBehaviour {
     [SerializeField] private Animator _animator;
     [SerializeField] private float _groundDetectionHeight;
     [SerializeField] private float _fallGravityMultiplier;
-    [SerializeField] private Camera _camera;
     [SerializeField] private PhysicsMaterial2D _zeroFrictionMat;
     [SerializeField] private PhysicsMaterial2D _fullFrictionMat;
+    [SerializeField] private ParticleSystem _deathParticleSystem;
+    [SerializeField] private ParticleSystem _runParticleSystem;
+
     private const float DEFAULT_GRAVITY_SCALE = 3f;
     private const float RUN_SPEED_MULTIPLIER = 10f;
+    private PlayerAudioManager _playerAudioManager;
     private Rigidbody2D _rigidbody;
     private float _horizontalMovement = 0;
     private bool _isInAir = false;
@@ -20,8 +23,6 @@ public class Player : MonoBehaviour {
     private bool _isDead = false;
     private bool _canMove = true;
     private bool _isRunning = false;
-    private PlayerAudioManager _playerAudioManager;
-
 
     public void Start() {
         this._rigidbody = this.GetComponent<Rigidbody2D>();
@@ -144,7 +145,7 @@ public class Player : MonoBehaviour {
         this._playerAudioManager.PlayDeathSound();
         this._animator.SetBool("isDead", true);
         this.ResetVelocity();
-        gameObject.GetComponent<ParticleSystem>().Play();
+        _deathParticleSystem.Play();
     }
 
     private void BeforeLandingOperations() {

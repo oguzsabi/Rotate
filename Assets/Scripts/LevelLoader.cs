@@ -15,6 +15,10 @@ public class LevelLoader : MonoBehaviour {
         SceneManager.LoadScene(0);
     }
 
+    public static string GetSceneName() {
+        return SceneManager.GetActiveScene().name;
+    }
+
     public static void QuitGame() {
         Application.Quit();
     }
