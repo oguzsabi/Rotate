@@ -3,174 +3,175 @@ using UnityEngine;
 public class Player : MonoBehaviour {
     [SerializeField] public bool isInvincible;
 
-    [SerializeField] private float _speed;
-    [SerializeField] private float _jumpForce;
-    [SerializeField] private Animator _animator;
-    [SerializeField] private float _groundDetectionHeight;
-    [SerializeField] private float _fallGravityMultiplier;
-    [SerializeField] private PhysicsMaterial2D _zeroFrictionMat;
-    [SerializeField] private PhysicsMaterial2D _fullFrictionMat;
-    [SerializeField] private ParticleSystem _deathParticleSystem;
-    [SerializeField] private ParticleSystem _runParticleSystem;
+    [SerializeField] private float speed = 35f;
+    [SerializeField] private float jumpForce = 14f;
+    [SerializeField] private Animator animator;
+    [SerializeField] private float groundDetectionHeight = 0.6f;
+    [SerializeField] private float fallGravityMultiplier = 1.5f;
+    [SerializeField] private PhysicsMaterial2D zeroFrictionMat;
+    [SerializeField] private PhysicsMaterial2D fullFrictionMat;
+    [SerializeField] private ParticleSystem deathParticleSystem;
+    [SerializeField] private ParticleSystem runParticleSystem;
 
-    private const float DEFAULT_GRAVITY_SCALE = 3f;
-    private const float RUN_SPEED_MULTIPLIER = 10f;
+    private static readonly int IsMoving = Animator.StringToHash("isMoving");
+    private static readonly int IsDead = Animator.StringToHash("isDead");
+    private static readonly int IsInAir = Animator.StringToHash("isInAir");
+    private const float DefaultGravityScale = 3f;
+    private const float RunSpeedMultiplier = 10f;
     private PlayerAudioManager _playerAudioManager;
     private Rigidbody2D _rigidbody;
-    private float _horizontalMovement = 0;
-    private bool _isInAir = false;
-    private bool _hasJumped = false;
-    private bool _isDead = false;
+    private float _horizontalMovement;
+    private bool _isInAir;
+    private bool _hasJumped;
+    private bool _isDead;
+    private bool _isRunning;
     private bool _canMove = true;
-    private bool _isRunning = false;
 
     public void Start() {
-        this._rigidbody = this.GetComponent<Rigidbody2D>();
-        this._playerAudioManager = this.GetComponentInChildren<PlayerAudioManager>();
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _playerAudioManager = GetComponentInChildren<PlayerAudioManager>();
     }
 
     public void FixedUpdate() {
-        if (this._isDead || !this._canMove) {
-            return;
-        }
+        if (_isDead || !_canMove) return;
 
-        this.HandleMovement();
+        HandleMovement();
     }
 
     public void Update() {
-        if (this._isDead || !this._canMove) {
-            return;
-        }
+        if (_isDead || !_canMove) return;
 
-        this.CheckGroundStatus();
-        this.Jump();
-        this.GetMovement();
-        this.HandleFriction();
-        this.SetFallingGravity();
-        this.PlaySFX();
+        CheckGroundStatus();
+        Jump();
+        GetMovement();
+        HandleFriction();
+        SetFallingGravity();
+        PlaySfx();
     }
 
     private void GetMovement() {
-        this._horizontalMovement = Input.GetAxis("Horizontal") * this._speed * RUN_SPEED_MULTIPLIER;
-        this._isRunning = Mathf.Abs(this._horizontalMovement) > 0;
+        _horizontalMovement = Input.GetAxis("Horizontal") * speed * RunSpeedMultiplier;
+        _isRunning = Mathf.Abs(_horizontalMovement) > 0;
     }
 
     private void HandleMovement() {
-        if (this._isRunning && !this._isInAir && !this._hasJumped) {
-            this._rigidbody.velocity = Vector2.ClampMagnitude(new Vector2(this._horizontalMovement * Time.fixedDeltaTime, this._rigidbody.velocity.y), 7f);
-        } else {
-            this._rigidbody.velocity = new Vector2(this._horizontalMovement * Time.fixedDeltaTime, this._rigidbody.velocity.y);
+        animator.SetBool(IsMoving, Mathf.Abs(_horizontalMovement) > 0);
+        FlipSpriteToMovementDirection(_horizontalMovement);
+        
+        if (_isRunning && !_isInAir && !_hasJumped) {
+            _rigidbody.velocity = Vector2.ClampMagnitude(new Vector2(_horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y), 7f);
+            runParticleSystem.Play();
         }
+        else _rigidbody.velocity = new Vector2(_horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y);
 
-        this._animator.SetBool("isMoving", Mathf.Abs(_horizontalMovement) > 0);
-        this.FlipSpriteToMovementDirection(_horizontalMovement);
+        if (_isInAir || !_isRunning) runParticleSystem.Stop();
     }
 
     private void HandleFriction() {
-        if (this._isRunning) {
-            this._rigidbody.sharedMaterial = this._zeroFrictionMat;
-        } else {
-            this._rigidbody.sharedMaterial = this._fullFrictionMat;
-        }
+        _rigidbody.sharedMaterial = _isRunning ? zeroFrictionMat : fullFrictionMat;
     }
 
     private void FlipSpriteToMovementDirection(float horizontalMovement) {
-        if (horizontalMovement > 0) {
-            transform.localScale = new Vector3(1, 1, 1);
-        } else if (horizontalMovement < 0) {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
+        var playerTransform = transform;
+        playerTransform.localScale = horizontalMovement switch
+        {
+            > 0 => new Vector3(1, 1, 1),
+            < 0 => new Vector3(-1, 1, 1),
+            _ => playerTransform.localScale
+        };
     }
 
     private void Jump() {
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && !this._isInAir) {
-            this._rigidbody.velocity = new Vector2(this._rigidbody.velocity.x, 0);
-            this._hasJumped = true;
+        if (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.UpArrow) || _isInAir) return;
 
-            this._rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
-            this._playerAudioManager.PlayJumpSound();
-        }
+        _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0);
+        _hasJumped = true;
+
+        _rigidbody.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+        _playerAudioManager.PlayJumpSound();
     }
 
     private void CheckGroundStatus() {
-        float direction = transform.localScale.x;
-        RaycastHit2D leftJumpRay = Physics2D.Raycast(
-            transform.position + new Vector3(direction * -0.1f, 0, 0),
+        var playerTransform = transform;
+        var direction = playerTransform.localScale.x;
+        var leftJumpRay = Physics2D.Raycast(
+            playerTransform.position + new Vector3(direction * -0.1f, 0, 0),
             Vector2.down,
-            this._groundDetectionHeight,
+            groundDetectionHeight,
             1 << LayerMask.NameToLayer("Ground")
         );
-        RaycastHit2D rightJumpRay = Physics2D.Raycast(
+        var rightJumpRay = Physics2D.Raycast(
             transform.position + new Vector3(direction * 0.25f, 0, 0),
             Vector2.down,
-            this._groundDetectionHeight,
+            groundDetectionHeight,
             1 << LayerMask.NameToLayer("Ground")
         );
 
         if (leftJumpRay.collider || rightJumpRay.collider) {
-            if (this._isInAir) {
-                this.BeforeLandingOperations();
-            }
+            if (_isInAir) BeforeLandingOperations();
 
-            this.SetIsInAir(false);
+            SetIsInAir(false);
 
             return;
         }
 
-        this.SetIsInAir(true);
+        SetIsInAir(true);
     }
 
     private void SetFallingGravity() {
-        if (this._rigidbody.velocity.y < 0) {
-            this._rigidbody.gravityScale = DEFAULT_GRAVITY_SCALE * this._fallGravityMultiplier;
+        if (_rigidbody.velocity.y < 0) {
+            _rigidbody.gravityScale = DefaultGravityScale * fallGravityMultiplier;
 
             return;
         }
 
-        this._rigidbody.gravityScale = DEFAULT_GRAVITY_SCALE;
+        _rigidbody.gravityScale = DefaultGravityScale;
     }
 
-    private void PlaySFX() {
-        if (this._isRunning && !this._playerAudioManager.IsPlaying() && !this._isInAir) {
-            this._playerAudioManager.PlayStepSound();
-        } else if ((!this._isRunning || this._isInAir) && this._playerAudioManager.IsPlaying()) {
-            this._playerAudioManager.StopStepSound();
+    private void PlaySfx() {
+        switch (_isRunning) {
+            case true when !_playerAudioManager.IsPlaying() && !_isInAir:
+                _playerAudioManager.PlayStepSound();
+                break;
+            case false or true when _playerAudioManager.IsPlaying():
+                _playerAudioManager.StopStepSound();
+                break;
         }
     }
 
     public void Die() {
-        this._isDead = true;
+        _isDead = true;
 
-        this.SetHasGravity(false);
-        this._playerAudioManager.PlayDeathSound();
-        this._animator.SetBool("isDead", true);
-        this.ResetVelocity();
-        _deathParticleSystem.Play();
+        SetHasGravity(false);
+        _playerAudioManager.PlayDeathSound();
+        animator.SetBool(IsDead, true);
+        ResetVelocity();
+        deathParticleSystem.Play();
     }
 
     private void BeforeLandingOperations() {
-        this._playerAudioManager.PlayLandingSound();
-        this._hasJumped = false;
+        _playerAudioManager.PlayLandingSound();
+        _hasJumped = false;
     }
 
     public void SetIsInAir(bool isInAir) {
-        this._isInAir = isInAir;
-        this._animator.SetBool("isInAir", isInAir);
+        _isInAir = isInAir;
+        animator.SetBool(IsInAir, isInAir);
     }
 
-    public void SetHasGravity(bool hasGravity, float gravityMultiplier = DEFAULT_GRAVITY_SCALE) {
+    public void SetHasGravity(bool hasGravity, float gravityMultiplier = DefaultGravityScale) {
         _rigidbody.gravityScale = hasGravity ? gravityMultiplier : 0f;
     }
 
     public void ResetVelocity() {
-        this._rigidbody.velocity = Vector2.zero;
+        _rigidbody.velocity = Vector2.zero;
     }
 
     public void SetCanMove(bool canMove) {
-        this._canMove = canMove;
+        _canMove = canMove;
     }
 
     public bool GetIsInAir() {
-        return this._isInAir;
+        return _isInAir;
     }
 }

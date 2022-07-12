@@ -2776,22 +2776,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5035568327700959793, guid: db9f4357f5ca243a7afb422609c168d0, type: 3}
-      propertyPath: _camera
-      value: 
-      objectReference: {fileID: 1615192711}
-    - target: {fileID: 5035568327700959793, guid: db9f4357f5ca243a7afb422609c168d0, type: 3}
-      propertyPath: _fullFrictionMat
-      value: 
-      objectReference: {fileID: 6200000, guid: 40c595f0a4bbbbf48b7b81334ed7115c, type: 2}
-    - target: {fileID: 5035568327700959793, guid: db9f4357f5ca243a7afb422609c168d0, type: 3}
-      propertyPath: _zeroFrictionMat
-      value: 
-      objectReference: {fileID: 6200000, guid: 005921c553856544687b95db685b0639, type: 2}
-    - target: {fileID: 5035568327700959794, guid: db9f4357f5ca243a7afb422609c168d0, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 6200000, guid: 005921c553856544687b95db685b0639, type: 2}
     - target: {fileID: 5035568327700959806, guid: db9f4357f5ca243a7afb422609c168d0, type: 3}
       propertyPath: m_Name
       value: Player
