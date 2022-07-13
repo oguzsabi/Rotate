@@ -14,4 +14,13 @@ public class AudioManager : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+
+    public static void MuteSound(bool muted) {
+        PlayerAudioManager.MuteAudio(muted);
+        RotateAudioManager.MuteAudio(muted);
+    }
+
+    public static void MuteMusic(bool muted) {
+        BackgroundAudioManager.MuteAudio(muted);
+    }
 }

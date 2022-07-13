@@ -1,20 +1,19 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class ExitDoor : MonoBehaviour {
-    [SerializeField] private float _exitTime = 0.15f;
+    [SerializeField] private float exitTime = 0.15f;
 
     public void OnTriggerStay2D(Collider2D other) {
         if (
-            other.gameObject.tag == "Player" &&
-            other.transform.localRotation.eulerAngles.z == transform.localRotation.eulerAngles.z
-        ) {
-            StartCoroutine(LoadNextLevel());
-        }
+            other.gameObject.CompareTag("Player") &&
+            Math.Abs(other.transform.localRotation.eulerAngles.z - transform.localRotation.eulerAngles.z) < 0.1
+        ) StartCoroutine(LoadNextLevel());
     }
 
     private IEnumerator LoadNextLevel() {
-        yield return new WaitForSeconds(_exitTime);
+        yield return new WaitForSeconds(exitTime);
         LevelLoader.LoadNextLevel();
     }
 }

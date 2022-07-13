@@ -1,15 +1,55 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class CameraCanvasManager : MonoBehaviour {
-    private static TextMeshProUGUI _deathCountText;
+    [SerializeField] private TextMeshProUGUI deathCountText;
+    [SerializeField] private TextMeshProUGUI timeText;
+    [Header("Music")]
+    [SerializeField] private Toggle musicToggle;
+    [SerializeField] private Sprite musicOnImage;
+    [SerializeField] private Sprite musicOffImage;
+    [Header("Sound")]
+    [SerializeField] private Toggle soundToggle;
+    [SerializeField] private Sprite soundOnImage;
+    [SerializeField] private Sprite soundOffImage;
 
     public void Start() {
-        _deathCountText = GameObject.FindGameObjectWithTag("DeathCount").GetComponent<TextMeshProUGUI>();
-        _deathCountText.text = Death.DeathCount.ToString();
+        UpdateUIText();
     }
 
-    public static void UpdateDeathCount(int count) {
-        _deathCountText.text = count.ToString();
+    public void Update() {
+        UpdateUIText();
+    }
+
+    private void UpdateUIText() {
+        deathCountText.text = ConsistentDataManager.DeathCount.ToString();
+        timeText.text = ConsistentDataManager.PassedTime;
+    }
+
+    public void MusicToggleChanged() {
+        var muted = !musicToggle.isOn;
+        AudioManager.MuteMusic(muted);
+
+        if (muted) {
+            musicToggle.GetComponent<Image>().sprite = musicOffImage;
+            
+            return;
+        }
+        
+        musicToggle.GetComponent<Image>().sprite = musicOnImage;
+    }
+
+    public void SoundToggleChanged() {
+        var muted = !soundToggle.isOn;
+        AudioManager.MuteSound(muted);
+
+        if (muted) {
+            soundToggle.GetComponent<Image>().sprite = soundOffImage;
+            
+            return;
+        }
+        
+        soundToggle.GetComponent<Image>().sprite = soundOnImage;
     }
 }

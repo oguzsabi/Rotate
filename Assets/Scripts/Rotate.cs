@@ -1,74 +1,62 @@
 using UnityEngine;
 
 public class Rotate : MonoBehaviour {
-    [SerializeField] private float _rotateSpeed = 1f;
-    [SerializeField] private Transform _playerTransform;
-    [SerializeField] private Transform _camera;
-    [SerializeField] private AudioSource _rotateAudioManager;
-    private bool _isRotating = false;
-    private const float ROTATE_ANGLE = 90f;
-    private float _currentRotateAngle = 0f;
-    private float _targetAngle = 0f;
+    [SerializeField] private float rotateSpeed = 300f;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform mainCamera;
+    [SerializeField] private AudioSource rotateAudioManager;
+
+    private bool _isRotating;
+    private const float RotateAngle = 90f;
+    private float _currentRotateAngle;
+    private float _targetAngle;
     private VirtualCameraController _virtualCameraController;
     private Player _player;
 
     public void Start() {
-        this._virtualCameraController = this._camera.GetComponentInChildren<VirtualCameraController>();
-        this._player = this._playerTransform.GetComponent<Player>();
+        _virtualCameraController = mainCamera.GetComponentInChildren<VirtualCameraController>();
+        _player = playerTransform.GetComponent<Player>();
     }
 
     public void Update() {
-        if (!this._player) {
-            this._player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        }
+        if (!_player) _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
 
-        this.HandleRotation();
-        this.RotateMap();
+        HandleRotation();
+        RotateMap();
     }
 
     private void HandleRotation() {
-        if (_isRotating || this._player.GetIsInAir()) {
-            return;
-        }
+        if (!Input.GetKeyDown(KeyCode.Q) && !Input.GetKeyDown(KeyCode.E) || _isRotating || _player.IsInAir) return;
 
-        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.E)) {
-            this._isRotating = true;
-            this._currentRotateAngle = Input.GetKeyDown(KeyCode.Q) ? ROTATE_ANGLE : -ROTATE_ANGLE;
-            this._targetAngle = this.CalculateTargetAngle();
+        _isRotating = true;
+        _currentRotateAngle = Input.GetKeyDown(KeyCode.Q) ? RotateAngle : -RotateAngle;
+        _targetAngle = CalculateTargetAngle();
 
-            this._rotateAudioManager.Play();
-            this._player.SetIsInAir(true);
-            this._player.SetHasGravity(false);
-            this._player.SetCanMove(false);
-            this._player.ResetVelocity();
-            this._virtualCameraController.SetDamping(0f);
-        }
+        rotateAudioManager.Play();
+        _virtualCameraController.SetDamping(0f);
+        _player.SetIsRotating(_isRotating);
     }
 
     private void RotateMap() {
-        if (!this._isRotating) {
-            return;
-        }
+        if (!_isRotating) return;
 
 
-        if (Mathf.Abs(this._targetAngle - transform.rotation.eulerAngles.z) < 0.0001f) {
-            this._isRotating = false;
+        if (Mathf.Abs(_targetAngle - transform.rotation.eulerAngles.z) < 0.0001f) {
+            _isRotating = false;
 
-            this._player.SetIsInAir(false);
-            this._player.SetHasGravity(true);
-            this._player.SetCanMove(true);
-            this._virtualCameraController.SetDamping(0.5f);
+            _virtualCameraController.SetDamping(0.5f);
+            _player.SetIsRotating(_isRotating);
 
             return;
         }
 
-        this._playerTransform.localRotation = Quaternion.RotateTowards(this._playerTransform.localRotation, Quaternion.Euler(0, 0, -this._targetAngle), this._rotateSpeed * Time.deltaTime);
-        this._camera.localRotation = Quaternion.RotateTowards(this._camera.localRotation, Quaternion.Euler(0, 0, -this._targetAngle), this._rotateSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, this._targetAngle), this._rotateSpeed * Time.deltaTime);
+        playerTransform.localRotation = Quaternion.RotateTowards(playerTransform.localRotation, Quaternion.Euler(0, 0, -_targetAngle), rotateSpeed * Time.deltaTime);
+        mainCamera.localRotation = Quaternion.RotateTowards(mainCamera.localRotation, Quaternion.Euler(0, 0, -_targetAngle), rotateSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, _targetAngle), rotateSpeed * Time.deltaTime);
     }
 
     private float CalculateTargetAngle() {
-        float targetAngle = Mathf.Round((transform.rotation.eulerAngles.z + _currentRotateAngle)) % 360f;
+        var targetAngle = Mathf.Round(transform.rotation.eulerAngles.z + _currentRotateAngle) % 360f;
 
         return targetAngle < 0 ? 360 + targetAngle : targetAngle;
     }

@@ -7,12 +7,10 @@ public class LevelLoader : MonoBehaviour {
     }
     
     public static void LoadNextLevel() {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
-    }
+        ConsistentDataManager.TimerStopped = true;
+        var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
 
-    public static void LoadStartScene() {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
     }
 
     public static string GetSceneName() {

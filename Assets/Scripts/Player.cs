@@ -6,30 +6,35 @@ public class Player : MonoBehaviour {
     [SerializeField] private float speed = 35f;
     [SerializeField] private float jumpForce = 14f;
     [SerializeField] private Animator animator;
-    [SerializeField] private float groundDetectionHeight = 0.6f;
     [SerializeField] private float fallGravityMultiplier = 1.5f;
     [SerializeField] private PhysicsMaterial2D zeroFrictionMat;
     [SerializeField] private PhysicsMaterial2D fullFrictionMat;
     [SerializeField] private ParticleSystem deathParticleSystem;
     [SerializeField] private ParticleSystem runParticleSystem;
+    [SerializeField] private ParticleSystem jumpParticleSystem;
+    [SerializeField] private ParticleSystem landParticleSystem;
 
-    private static readonly int IsMoving = Animator.StringToHash("isMoving");
-    private static readonly int IsDead = Animator.StringToHash("isDead");
-    private static readonly int IsInAir = Animator.StringToHash("isInAir");
+    public bool IsInAir { get; private set; }
+
+    private static readonly int IsMovingHash = Animator.StringToHash("isMoving");
+    private static readonly int IsDeadHash = Animator.StringToHash("isDead");
+    private static readonly int IsInAirHash = Animator.StringToHash("isInAir");
     private const float DefaultGravityScale = 3f;
     private const float RunSpeedMultiplier = 10f;
     private PlayerAudioManager _playerAudioManager;
     private Rigidbody2D _rigidbody;
     private float _horizontalMovement;
-    private bool _isInAir;
     private bool _hasJumped;
     private bool _isDead;
     private bool _isRunning;
     private bool _canMove = true;
+    private BoxCollider2D _groundCheckCollider;
 
     public void Start() {
+        ConsistentDataManager.TimerStopped = false;
         _rigidbody = GetComponent<Rigidbody2D>();
         _playerAudioManager = GetComponentInChildren<PlayerAudioManager>();
+        _groundCheckCollider = GetComponent<BoxCollider2D>();
     }
 
     public void FixedUpdate() {
@@ -55,16 +60,17 @@ public class Player : MonoBehaviour {
     }
 
     private void HandleMovement() {
-        animator.SetBool(IsMoving, Mathf.Abs(_horizontalMovement) > 0);
+        animator.SetBool(IsMovingHash, Mathf.Abs(_horizontalMovement) > 0);
         FlipSpriteToMovementDirection(_horizontalMovement);
-        
-        if (_isRunning && !_isInAir && !_hasJumped) {
+
+        if (_isRunning && !IsInAir && !_hasJumped) {
             _rigidbody.velocity = Vector2.ClampMagnitude(new Vector2(_horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y), 7f);
             runParticleSystem.Play();
+        } else {
+            _rigidbody.velocity = new Vector2(_horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y);
         }
-        else _rigidbody.velocity = new Vector2(_horizontalMovement * Time.fixedDeltaTime, _rigidbody.velocity.y);
 
-        if (_isInAir || !_isRunning) runParticleSystem.Stop();
+        if (IsInAir || !_isRunning) runParticleSystem.Stop();
     }
 
     private void HandleFriction() {
@@ -82,33 +88,19 @@ public class Player : MonoBehaviour {
     }
 
     private void Jump() {
-        if (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.UpArrow) || _isInAir) return;
+        if (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.UpArrow) || IsInAir) return;
 
         _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0);
         _hasJumped = true;
 
         _rigidbody.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+        jumpParticleSystem.Play();
         _playerAudioManager.PlayJumpSound();
     }
 
     private void CheckGroundStatus() {
-        var playerTransform = transform;
-        var direction = playerTransform.localScale.x;
-        var leftJumpRay = Physics2D.Raycast(
-            playerTransform.position + new Vector3(direction * -0.1f, 0, 0),
-            Vector2.down,
-            groundDetectionHeight,
-            1 << LayerMask.NameToLayer("Ground")
-        );
-        var rightJumpRay = Physics2D.Raycast(
-            transform.position + new Vector3(direction * 0.25f, 0, 0),
-            Vector2.down,
-            groundDetectionHeight,
-            1 << LayerMask.NameToLayer("Ground")
-        );
-
-        if (leftJumpRay.collider || rightJumpRay.collider) {
-            if (_isInAir) BeforeLandingOperations();
+        if (_groundCheckCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) {
+            if (IsInAir) BeforeLandingOperations();
 
             SetIsInAir(false);
 
@@ -129,13 +121,10 @@ public class Player : MonoBehaviour {
     }
 
     private void PlaySfx() {
-        switch (_isRunning) {
-            case true when !_playerAudioManager.IsPlaying() && !_isInAir:
-                _playerAudioManager.PlayStepSound();
-                break;
-            case false or true when _playerAudioManager.IsPlaying():
-                _playerAudioManager.StopStepSound();
-                break;
+        if (_isRunning && !PlayerAudioManager.IsPlaying && !IsInAir) {
+            _playerAudioManager.PlayStepSound();
+        } else if ((IsInAir || !_isRunning) && PlayerAudioManager.IsPlaying) {
+            _playerAudioManager.StopStepSound();
         }
     }
 
@@ -144,34 +133,47 @@ public class Player : MonoBehaviour {
 
         SetHasGravity(false);
         _playerAudioManager.PlayDeathSound();
-        animator.SetBool(IsDead, true);
+        animator.SetBool(IsDeadHash, true);
         ResetVelocity();
         deathParticleSystem.Play();
     }
 
     private void BeforeLandingOperations() {
+        landParticleSystem.Play();
         _playerAudioManager.PlayLandingSound();
         _hasJumped = false;
     }
 
-    public void SetIsInAir(bool isInAir) {
-        _isInAir = isInAir;
-        animator.SetBool(IsInAir, isInAir);
+    private void SetIsInAir(bool isInAir) {
+        IsInAir = isInAir;
+        animator.SetBool(IsInAirHash, isInAir);
     }
 
-    public void SetHasGravity(bool hasGravity, float gravityMultiplier = DefaultGravityScale) {
-        _rigidbody.gravityScale = hasGravity ? gravityMultiplier : 0f;
+    private void SetHasGravity(bool hasGravity) {
+        _rigidbody.gravityScale = hasGravity ? DefaultGravityScale : 0f;
     }
 
-    public void ResetVelocity() {
+    private void ResetVelocity() {
         _rigidbody.velocity = Vector2.zero;
     }
 
-    public void SetCanMove(bool canMove) {
-        _canMove = canMove;
+    public void SetIsRotating(bool isRotating) {
+        SetIsInAir(isRotating);
+        SetHasGravity(!isRotating);
+        _canMove = !isRotating;
+
+        if (!isRotating) return;
+
+        ResetVelocity();
+        ResetAndClearParticles();
     }
 
-    public bool GetIsInAir() {
-        return _isInAir;
+    private void ResetAndClearParticles() {
+        runParticleSystem.Stop();
+        runParticleSystem.Clear();
+        jumpParticleSystem.Stop();
+        jumpParticleSystem.Clear();
+        landParticleSystem.Stop();
+        landParticleSystem.Clear();
     }
 }

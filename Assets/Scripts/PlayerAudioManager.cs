@@ -1,49 +1,54 @@
 using UnityEngine;
 
 public class PlayerAudioManager : MonoBehaviour {
-    [SerializeField] private AudioClip _jumpSound;
-    [SerializeField] private AudioClip _stepSound;
-    [SerializeField] private AudioClip _landingSound;
-    [SerializeField] private AudioClip _deathSound;
-    private float _stepSoundCurrentTime = 0f;
-    private AudioSource _audioSource;
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip stepSound;
+    [SerializeField] private AudioClip landingSound;
+    [SerializeField] private AudioClip deathSound;
+
+    private float _stepSoundCurrentTime;
+    private static float _defaultVolume;
+    private static AudioSource _audioSource;
+    
+    public static bool IsPlaying => _audioSource.isPlaying;
 
     public void Start() {
-        this._audioSource = this.GetComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
+        _defaultVolume = _audioSource.volume;
     }
 
     public void PlayJumpSound() {
-        this._audioSource.clip = this._jumpSound;
-        this._audioSource.PlayOneShot(this._jumpSound);
+        _audioSource.clip = jumpSound;
+        _audioSource.PlayOneShot(jumpSound);
     }
 
     public void PlayLandingSound() {
-        this._audioSource.clip = this._landingSound;
-        this._audioSource.PlayOneShot(this._landingSound);
+        _audioSource.clip = landingSound;
+        _audioSource.PlayOneShot(landingSound);
     }
 
     public void PlayStepSound() {
-        this._audioSource.clip = this._stepSound;
-        this._audioSource.time = this._stepSoundCurrentTime;
-        this._audioSource.Play();
+        _audioSource.clip = stepSound;
+        _audioSource.time = _stepSoundCurrentTime;
+        _audioSource.Play();
     }
 
     public void StopStepSound() {
-        this._stepSoundCurrentTime = this._audioSource.time;
+        _stepSoundCurrentTime = _audioSource.time;
         
-        if (this._audioSource.clip != this._stepSound) {
+        if (_audioSource.clip != stepSound) {
             return;
         }
 
-        this._audioSource.Stop();
+        _audioSource.Stop();
     }
 
     public void PlayDeathSound() {
-        this._audioSource.clip = this._deathSound;
-        this._audioSource.PlayOneShot(this._deathSound);
+        _audioSource.clip = deathSound;
+        _audioSource.PlayOneShot(deathSound);
     }
 
-    public bool IsPlaying() {
-        return this._audioSource.isPlaying;
+    public static void MuteAudio(bool muted) {
+        _audioSource.volume = muted ? 0 : _defaultVolume;
     }
 }

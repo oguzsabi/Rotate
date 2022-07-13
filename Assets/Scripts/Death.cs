@@ -2,26 +2,23 @@ using System.Collections;
 using UnityEngine;
 
 public class Death : MonoBehaviour {
-    [SerializeField] private float _restartTime;
-
-    private static int _deathCount = 0;
-    public static int DeathCount { get { return _deathCount; } }
+    [SerializeField] private float restartTime = 1f;
 
     public void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag == "Player") {
-            CameraCanvasManager.UpdateDeathCount(++_deathCount);
+        if (!other.gameObject.CompareTag("Player")) return;
 
-            Player player = other.gameObject.GetComponent<Player>();
+        ConsistentDataManager.IncrementDeathCount();
 
-            if (!player.isInvincible) {
-                other.gameObject.GetComponent<Player>().Die();
-                StartCoroutine(RestartLevel());
-            }
-        }
+        var player = other.gameObject.GetComponent<Player>();
+
+        if (player.isInvincible) return;
+
+        other.gameObject.GetComponent<Player>().Die();
+        StartCoroutine(RestartLevel());
     }
 
-    public IEnumerator RestartLevel() {
-        yield return new WaitForSeconds(this._restartTime);
+    private IEnumerator RestartLevel() {
+        yield return new WaitForSeconds(restartTime);
 
         LevelLoader.RestartLevel();
     }
