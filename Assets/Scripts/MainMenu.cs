@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,11 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Sprite soundOnImage;
     [SerializeField] private Sprite soundOffImage;
+
+    private void Start() {
+        if (ConsistentDataManager.MusicMuted) musicToggle.isOn = false;
+        if (ConsistentDataManager.SoundMuted) soundToggle.isOn = false;
+    }
 
     public void MusicToggleChanged() {
         var muted = !musicToggle.isOn;

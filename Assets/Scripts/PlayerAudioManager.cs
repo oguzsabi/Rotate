@@ -7,14 +7,13 @@ public class PlayerAudioManager : MonoBehaviour {
     [SerializeField] private AudioClip deathSound;
 
     private float _stepSoundCurrentTime;
-    private static float _defaultVolume;
     private static AudioSource _audioSource;
     
     public static bool IsPlaying => _audioSource.isPlaying;
 
     public void Start() {
         _audioSource = GetComponent<AudioSource>();
-        _defaultVolume = _audioSource.volume;
+        _audioSource.mute = ConsistentDataManager.SoundMuted;
     }
 
     public void PlayJumpSound() {
@@ -49,6 +48,8 @@ public class PlayerAudioManager : MonoBehaviour {
     }
 
     public static void MuteAudio(bool muted) {
-        _audioSource.volume = muted ? 0 : _defaultVolume;
+        if (!_audioSource) return;
+        
+        _audioSource.mute = muted;
     }
 }

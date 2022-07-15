@@ -4,6 +4,8 @@ public class ConsistentDataManager : MonoBehaviour {
     public static int DeathCount { get; private set; }
     public static string PassedTime { get; private set; }
     public static bool TimerStopped { get; set; } = true;
+    public static bool MusicMuted { get; set; } = false;
+    public static bool SoundMuted { get; set; } = false;
 
     private static bool _resetTime;
     private float _passedTime;

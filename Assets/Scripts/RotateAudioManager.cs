@@ -1,15 +1,16 @@
 using UnityEngine;
 
 public class RotateAudioManager : MonoBehaviour {
-    private static float _defaultVolume;
     private static AudioSource _audioSource;
 
     private void Start() {
         _audioSource = GetComponent<AudioSource>();
-        _defaultVolume = _audioSource.volume;
+        _audioSource.mute = ConsistentDataManager.SoundMuted;
     }
 
     public static void MuteAudio(bool muted) {
-        _audioSource.volume = muted ? 0 : _defaultVolume;
+        if (!_audioSource) return;
+        
+        _audioSource.mute = muted;
     }
 }

@@ -16,11 +16,13 @@ public class AudioManager : MonoBehaviour {
     }
 
     public static void MuteSound(bool muted) {
+        ConsistentDataManager.SoundMuted = muted;
         PlayerAudioManager.MuteAudio(muted);
         RotateAudioManager.MuteAudio(muted);
     }
 
     public static void MuteMusic(bool muted) {
+        ConsistentDataManager.MusicMuted = muted;
         BackgroundAudioManager.MuteAudio(muted);
     }
 }

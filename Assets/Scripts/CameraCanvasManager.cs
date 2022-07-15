@@ -16,6 +16,9 @@ public class CameraCanvasManager : MonoBehaviour {
 
     public void Start() {
         UpdateUIText();
+
+        if (ConsistentDataManager.MusicMuted) musicToggle.isOn = false;
+        if (ConsistentDataManager.SoundMuted) soundToggle.isOn = false;
     }
 
     public void Update() {
