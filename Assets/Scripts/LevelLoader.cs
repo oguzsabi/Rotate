@@ -17,6 +17,11 @@ public class LevelLoader : MonoBehaviour {
         return SceneManager.GetActiveScene().name;
     }
 
+    public static void LoadMainMenu() {
+        ConsistentDataManager.ResetData();
+        SceneManager.LoadScene("Main_Menu");
+    }
+
     public static void QuitGame() {
         Application.Quit();
     }

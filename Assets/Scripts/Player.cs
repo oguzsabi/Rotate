@@ -88,7 +88,7 @@ public class Player : MonoBehaviour {
     }
 
     private void Jump() {
-        if (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.UpArrow) || IsInAir) return;
+        if (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.UpArrow) && !Input.GetKeyDown(KeyCode.W) || IsInAir) return;
 
         _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0);
         _hasJumped = true;

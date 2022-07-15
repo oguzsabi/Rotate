@@ -4,8 +4,8 @@ public class ConsistentDataManager : MonoBehaviour {
     public static int DeathCount { get; private set; }
     public static string PassedTime { get; private set; }
     public static bool TimerStopped { get; set; } = true;
-    public static bool SoundOn { get; set; }
 
+    private static bool _resetTime;
     private float _passedTime;
 
     public void Awake() {
@@ -13,9 +13,9 @@ public class ConsistentDataManager : MonoBehaviour {
     }
 
     private void SetupSingleton() {
-        var audioManagerCount = FindObjectsOfType(GetType()).Length;
+        var consistentDataManagerCount = FindObjectsOfType(GetType()).Length;
 
-        if (audioManagerCount < 2) {
+        if (consistentDataManagerCount < 2) {
             DontDestroyOnLoad(gameObject);
         } else {
             Destroy(gameObject);
@@ -23,6 +23,11 @@ public class ConsistentDataManager : MonoBehaviour {
     }
 
     private void Update() {
+        if (_resetTime) {
+            _resetTime = false;
+            _passedTime = 0;
+        }
+        
         if (TimerStopped) return;
 
         ConvertSecondsToStringTime();
@@ -46,5 +51,11 @@ public class ConsistentDataManager : MonoBehaviour {
 
     public static void IncrementDeathCount() {
         DeathCount++;
+    }
+
+    public static void ResetData() {
+        _resetTime = true;
+        DeathCount = 0;
+        PassedTime = "";
     }
 }
