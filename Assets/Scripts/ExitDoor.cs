@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ public class ExitDoor : MonoBehaviour {
     public void OnTriggerStay2D(Collider2D other) {
         if (
             other.gameObject.CompareTag("Player") &&
-            Math.Abs(other.transform.localRotation.eulerAngles.z - transform.localRotation.eulerAngles.z) < 0.1
+            Mathf.Approximately(other.transform.localRotation.eulerAngles.z, transform.localRotation.eulerAngles.z)
         ) StartCoroutine(LoadNextLevel());
     }
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -28,13 +29,11 @@ public class Player : MonoBehaviour {
     private bool _isDead;
     private bool _isRunning;
     private bool _canMove = true;
-    private BoxCollider2D _groundCheckCollider;
-
+    
     public void Start() {
         ConsistentDataManager.TimerStopped = false;
         _rigidbody = GetComponent<Rigidbody2D>();
         _playerAudioManager = GetComponentInChildren<PlayerAudioManager>();
-        _groundCheckCollider = GetComponent<BoxCollider2D>();
     }
 
     public void FixedUpdate() {
@@ -46,7 +45,6 @@ public class Player : MonoBehaviour {
     public void Update() {
         if (_isDead || !_canMove) return;
 
-        CheckGroundStatus();
         Jump();
         GetMovement();
         HandleFriction();
@@ -98,18 +96,6 @@ public class Player : MonoBehaviour {
         _playerAudioManager.PlayJumpSound();
     }
 
-    private void CheckGroundStatus() {
-        if (_groundCheckCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) {
-            if (IsInAir) BeforeLandingOperations();
-
-            SetIsInAir(false);
-
-            return;
-        }
-
-        SetIsInAir(true);
-    }
-
     private void SetFallingGravity() {
         if (_rigidbody.velocity.y < 0) {
             _rigidbody.gravityScale = DefaultGravityScale * fallGravityMultiplier;
@@ -138,13 +124,13 @@ public class Player : MonoBehaviour {
         deathParticleSystem.Play();
     }
 
-    private void BeforeLandingOperations() {
+    public void BeforeLandingOperations() {
         landParticleSystem.Play();
         _playerAudioManager.PlayLandingSound();
         _hasJumped = false;
     }
 
-    private void SetIsInAir(bool isInAir) {
+    public void SetIsInAir(bool isInAir) {
         IsInAir = isInAir;
         animator.SetBool(IsInAirHash, isInAir);
     }
@@ -176,4 +162,15 @@ public class Player : MonoBehaviour {
         landParticleSystem.Stop();
         landParticleSystem.Clear();
     }
+
+    // private void OnCollisionEnter2D(Collision2D col) {
+    //     Debug.Log("collision");
+    //     
+    //     if (!_groundCheckCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) return;
+    //     
+    //     Debug.Log("landed");
+    //     if (IsInAir) BeforeLandingOperations();
+    //
+    //     SetIsInAir(false);
+    // }
 }
