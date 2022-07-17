@@ -1,30 +1,29 @@
 using UnityEngine;
 
 public class OneWayPlatform : MonoBehaviour {
+    [SerializeField] private Transform player;
+
+    private const float ColliderHeightOffset = 0.155f;
+    private GameObject _activator;
     private BoxCollider2D _collider;
 
     private void Start() {
         _collider = GetComponent<BoxCollider2D>();
+        _activator = GameObject.Find("OneWayPlatformActivator");
     }
 
-    private void OnCollisionExit2D(Collision2D col) {
-        if (!col.transform.CompareTag("Player")) return;
+    private void Update() {
+        var platformPosition = transform.position;
 
-        _collider.isTrigger = true;
-    }
-
-    private void OnTriggerStay2D(Collider2D col) {
         if (
-            !col.name.Equals("OneWayPlatformActivator") ||
-            !Mathf.Approximately(col.transform.parent.localRotation.eulerAngles.z, transform.localRotation.eulerAngles.z)
-        ) return;
+            _activator.transform.position.y > platformPosition.y + Mathf.Sign(platformPosition.y) * ColliderHeightOffset &&
+            Mathf.Approximately(player.rotation.eulerAngles.z, transform.rotation.eulerAngles.z)
+        ) {
+            _collider.isTrigger = false;
 
-        _collider.isTrigger = false;
-    }
-
-    private void OnTriggerExit2D(Collider2D col) {
-        if (!col.name.Equals("OneWayPlatformActivator")) return;
-
+            return;
+        } 
+        
         _collider.isTrigger = true;
     }
 }
